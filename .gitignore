@@ -44,8 +44,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Documentation
+# Documentation (local tracking only)
 progress.md
 ../progress.md
-README.md
-../README.md
