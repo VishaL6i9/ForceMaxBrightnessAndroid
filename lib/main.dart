@@ -38,11 +38,24 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
   int _brightnessMode = 0; // 0 = MANUAL, 1 = AUTO
   bool _windowBrightnessActive = false;
   bool _serviceRunning = false;
+  bool _autoStartEnabled = false;
   
   @override
   void initState() {
     super.initState();
     _checkPermission();
+    _loadSettings();
+  }
+  
+  Future<void> _loadSettings() async {
+    try {
+      final bool autoStart = await platform.invokeMethod('getAutoStart');
+      setState(() {
+        _autoStartEnabled = autoStart;
+      });
+    } catch (e) {
+      // Ignore errors during settings load
+    }
   }
   
   Future<void> _checkPermission() async {
@@ -166,6 +179,22 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
       setState(() {
         _serviceRunning = false;
         _statusMessage = 'Media monitor stopped';
+      });
+    } on PlatformException catch (e) {
+      setState(() {
+        _statusMessage = 'Error: ${e.message}';
+      });
+    }
+  }
+  
+  Future<void> _setAutoStart(bool enabled) async {
+    try {
+      await platform.invokeMethod('setAutoStart', {'enabled': enabled});
+      setState(() {
+        _autoStartEnabled = enabled;
+        _statusMessage = enabled 
+            ? 'Auto-start enabled (will start on boot)'
+            : 'Auto-start disabled';
       });
     } on PlatformException catch (e) {
       setState(() {
@@ -495,6 +524,13 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    SwitchListTile(
+                      title: const Text('Auto-start on boot'),
+                      subtitle: const Text('Start monitoring when device boots'),
+                      value: _autoStartEnabled,
+                      onChanged: _setAutoStart,
                     ),
                   ],
                 ),

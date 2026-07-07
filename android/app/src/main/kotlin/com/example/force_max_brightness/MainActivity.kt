@@ -173,6 +173,21 @@ class MainActivity : FlutterActivity() {
                     context.stopService(intent)
                     result.success(null)
                 }
+                "setAutoStart" -> {
+                    val enabled = call.argument<Boolean>("enabled")
+                    if (enabled == null) {
+                        result.error("INVALID_ARGUMENT", "Enabled value required", null)
+                        return@setMethodCallHandler
+                    }
+                    val prefs = context.getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putBoolean("auto_start_service", enabled).apply()
+                    result.success(null)
+                }
+                "getAutoStart" -> {
+                    val prefs = context.getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
+                    val enabled = prefs.getBoolean("auto_start_service", false)
+                    result.success(enabled)
+                }
                 else -> {
                     result.notImplemented()
                 }
