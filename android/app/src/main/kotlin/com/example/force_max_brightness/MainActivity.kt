@@ -59,6 +59,60 @@ class MainActivity : FlutterActivity() {
                         result.error("ERROR", "Could not set brightness", e.message)
                     }
                 }
+                "setWindowBrightness" -> {
+                    val brightness = call.argument<Int>("brightness")
+                    if (brightness == null) {
+                        result.error("INVALID_ARGUMENT", "Brightness value is required", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        activity?.runOnUiThread {
+                            val layoutParams = activity?.window?.attributes
+                            layoutParams?.screenBrightness = if (brightness == -1) {
+                                -1.0f  // Use system brightness
+                            } else {
+                                brightness.coerceIn(0, 255) / 255.0f
+                            }
+                            activity?.window?.attributes = layoutParams
+                        }
+                        result.success(null)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Could not set window brightness", e.message)
+                    }
+                }
+                "getBrightnessMode" -> {
+                    try {
+                        val mode = Settings.System.getInt(
+                            contentResolver,
+                            Settings.System.SCREEN_BRIGHTNESS_MODE
+                        )
+                        // 0 = MANUAL, 1 = AUTOMATIC
+                        result.success(mode)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Could not get brightness mode", e.message)
+                    }
+                }
+                "setBrightnessMode" -> {
+                    val mode = call.argument<Int>("mode")
+                    if (mode == null) {
+                        result.error("INVALID_ARGUMENT", "Mode value is required (0=MANUAL, 1=AUTO)", null)
+                        return@setMethodCallHandler
+                    }
+                    if (!Settings.System.canWrite(context)) {
+                        result.error("PERMISSION_DENIED", "WRITE_SETTINGS permission not granted", null)
+                        return@setMethodCallHandler
+                    }
+                    try {
+                        Settings.System.putInt(
+                            contentResolver,
+                            Settings.System.SCREEN_BRIGHTNESS_MODE,
+                            mode.coerceIn(0, 1)
+                        )
+                        result.success(null)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Could not set brightness mode", e.message)
+                    }
+                }
                 "getSystemSetting" -> {
                     val key = call.argument<String>("key")
                     val isGlobal = call.argument<Boolean>("isGlobal") ?: false

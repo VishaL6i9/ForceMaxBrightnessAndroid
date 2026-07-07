@@ -35,6 +35,8 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
   int _currentBrightness = 128;
   double _sliderValue = 128;
   String _statusMessage = 'Initializing...';
+  int _brightnessMode = 0; // 0 = MANUAL, 1 = AUTO
+  bool _windowBrightnessActive = false;
   
   @override
   void initState() {
@@ -79,10 +81,12 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
   Future<void> _getCurrentBrightness() async {
     try {
       final int brightness = await platform.invokeMethod('getSystemBrightness');
+      final int mode = await platform.invokeMethod('getBrightnessMode');
       setState(() {
         _currentBrightness = brightness;
         _sliderValue = brightness.toDouble();
-        _statusMessage = 'Current brightness: $brightness/255';
+        _brightnessMode = mode;
+        _statusMessage = 'Brightness: $brightness/255, Mode: ${mode == 0 ? "MANUAL" : "AUTO"}';
       });
     } on PlatformException catch (e) {
       setState(() {
@@ -108,6 +112,37 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
   Future<void> _setMaxBrightness() async {
     await _setBrightness(255);
     _sliderValue = 255;
+  }
+  
+  Future<void> _setWindowBrightness(int brightness) async {
+    try {
+      await platform.invokeMethod('setWindowBrightness', {'brightness': brightness});
+      setState(() {
+        _windowBrightnessActive = brightness != -1;
+        _statusMessage = brightness == -1 
+            ? 'Window brightness reset to system'
+            : 'Window brightness set to $brightness/255';
+      });
+    } on PlatformException catch (e) {
+      setState(() {
+        _statusMessage = 'Error: ${e.message}';
+      });
+    }
+  }
+  
+  Future<void> _setBrightnessMode(int mode) async {
+    try {
+      await platform.invokeMethod('setBrightnessMode', {'mode': mode});
+      setState(() {
+        _brightnessMode = mode;
+        _statusMessage = 'Brightness mode set to ${mode == 0 ? "MANUAL" : "AUTO"}';
+      });
+      _getCurrentBrightness();
+    } on PlatformException catch (e) {
+      setState(() {
+        _statusMessage = 'Error: ${e.message}';
+      });
+    }
   }
   
   Future<void> _readSetting(String key, bool isGlobal) async {
@@ -263,6 +298,22 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
                     ),
                     const SizedBox(height: 16),
                     Text('Current: ${_currentBrightness}/255 (${(_currentBrightness / 255 * 100).toStringAsFixed(0)}%)'),
+                    Text('Mode: ${_brightnessMode == 0 ? "MANUAL" : "AUTO"}', 
+                         style: TextStyle(color: _brightnessMode == 1 ? Colors.orange : Colors.green)),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: _hasPermission ? () => _setBrightnessMode(0) : null,
+                          child: const Text('Manual'),
+                        ),
+                        TextButton(
+                          onPressed: _hasPermission ? () => _setBrightnessMode(1) : null,
+                          child: const Text('Auto'),
+                        ),
+                      ],
+                    ),
                     Slider(
                       value: _sliderValue,
                       min: 0,
@@ -301,6 +352,60 @@ class _BrightnessControlPageState extends State<BrightnessControlPage> {
                       onPressed: _hasPermission ? _getCurrentBrightness : null,
                       icon: const Icon(Icons.refresh),
                       label: const Text('Read Current'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Window Brightness Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Window Brightness Override',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (_windowBrightnessActive)
+                          const Icon(Icons.flash_on, color: Colors.orange),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'App-level brightness (instant, no permission needed)',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => _setWindowBrightness(255),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                          ),
+                          child: const Text('Force Max'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _setWindowBrightness(128),
+                          child: const Text('Medium'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _setWindowBrightness(-1),
+                          child: const Text('Reset'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
