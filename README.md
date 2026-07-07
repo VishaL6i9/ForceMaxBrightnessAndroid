@@ -1,55 +1,84 @@
-# Force Max HDR Brightness
+# Radiance
 
-A native Android app built with Jetpack Compose that automatically forces maximum screen brightness during media playback on unrooted devices.
+A modern Android application for intelligent brightness management with automatic media playback detection.
 
 [![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-blue.svg)](https://kotlinlang.org/)
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.02-brightgreen.svg)](https://developer.android.com/jetpack/compose)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Material3](https://img.shields.io/badge/Material%203-Dynamic%20Colors-purple.svg)](https://m3.material.io/)
+[![License](https://img.shields.io/badge/License-AGPL%20v3-orange.svg)](LICENSE)
+[![APK Size](https://img.shields.io/badge/APK%20Size-16.66%20MB-blue.svg)]()
 
 ## Overview
 
-Force Max HDR Brightness is a lightweight Android application designed to automatically boost screen brightness during HDR/Dolby Vision video playback. Built entirely with Jetpack Compose and Material 3, it provides a modern, responsive UI for managing system brightness on unrooted Android devices.
+Radiance is a lightweight brightness control application for Android that intelligently manages screen brightness during media playback. Built entirely with **Jetpack Compose** and **Material 3** with dynamic system colors, it provides a modern, responsive interface with zero bloat.
 
-**Key Achievement:** Reduced APK size by 76% through migration from Flutter to native Compose (69.5 MB → 16.64 MB).
+**Key Achievement:** 76% APK size reduction compared to Flutter (69.5 MB → 16.66 MB)
 
 ## Features
 
-### Brightness Control
-- **Manual system brightness** control via slider (0-255)
-- **Preset brightness buttons** (Min, Mid, Max)
-- **Window-level brightness override** - instant, no permission needed
-- **Brightness mode toggle** - switch between manual and automatic modes
-- **Permission status display** with one-tap permission grant
+### System Brightness Control
+- **Manual brightness adjustment** with precise 0-255 slider control
+- **Quick presets** (Min, Mid, Max) for common brightness levels
+- **Automatic/Manual mode toggle** for system brightness adaptation
+- **Real-time percentage display** of current brightness level
+- **Smooth animations** during transitions
 
-### Media Monitoring
-- **Real-time media playback detection** using MediaSession monitoring
-- **Automatic brightness boost** when video playback starts
-- **Automatic brightness restore** when playback stops/pauses
+### Window-Level Brightness Override
+- **Instant window brightness control** (no permissions required)
+- **Overrides system settings** at the application window level
+- **Quick action buttons** (Max, Medium, Reset)
+- **Independent from system brightness** for granular control
+
+### Media Playback Monitoring
+- **Automatic detection** of media playback via MediaSession API
+- **Auto-boost brightness** during playback (customizable)
+- **Auto-restore brightness** when playback stops
 - **Foreground service** with persistent notification
-- **Auto-start on boot** - optional service launch at device startup
-- **System integration** - respects status bar and system insets
+- **Auto-start on boot** (optional)
 
-### User Experience
-- **Modern Material 3 UI** with card-based layout
-- **Responsive design** with scroll support
-- **Real-time status updates** and permission feedback
-- **Persistent settings** stored across app restarts
-- **Dark theme support** via Material 3 color scheme
+### Modern UI/UX
+- **Material 3 design system** with dynamic system colors (Android 12+)
+- **Dark/Light mode** automatically detected from system settings
+- **Elegant card-based layout** with smooth animations
+- **Responsive design** adapting to all screen sizes
+- **FilterChips** for mode selection with visual feedback
+- **ElevatedCards** with shadows for depth
+- **Real-time status bar** with animated transitions
 
-## Target Device
-- **Device**: OnePlus 13 (tested)
-- **Android Version**: Android 16 (Android 7.0+ supported)
-- **Constraint**: Unrooted device
+### Settings & Persistence
+- **SharedPreferences** for settings persistence
+- **Auto-start on device boot** toggle
+- **Automatic state restoration** after app restart
+- **Permission state tracking** with real-time UI updates
 
-## Installation
+## Screenshots
 
-### From Source
+_Coming soon_
+
+## Getting Started
+
+### Prerequisites
+
+**Runtime Requirements:**
+- Android 7.0 (API 24) or higher
+- `WRITE_SETTINGS` permission (granted via system settings)
+- Optional: `FOREGROUND_SERVICE` for media monitoring
+
+**Development Requirements:**
+- Android Studio 2024.1.1 or later
+- JDK 23
+- Android SDK 35+
+- Gradle 8.12
+
+### Installation
+
+#### From Source
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YourUsername/ForceMaxBrightness.git
-cd ForceMaxBrightness/force_max_brightness
+git clone https://github.com/VishaL6i9/Radiance.git
+cd Radiance
 ```
 
 2. Build the debug APK:
@@ -58,206 +87,211 @@ cd android
 ./gradlew assembleDebug
 ```
 
-3. Install on device:
+3. Install on your device:
 ```bash
-adb install build/app/outputs/apk/debug/app-debug.apk
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-### Build Requirements
+Or build and install in one step:
+```bash
+./gradlew installDebug
+```
 
-- Android Studio Hedgehog or later
-- JDK 23+
-- Android SDK 35+
-- Gradle 8.12+
+#### APK Download
 
-## Setup & Permissions
+Download the latest APK from [Releases](../../releases)
 
-### Required Permissions
+#### First Launch
 
-1. **WRITE_SETTINGS**
-   - Required for system brightness control
-   - App will prompt you to grant permission in Settings
-   - Navigate to: **Settings → Apps → Special Access → Modify system settings**
-
-2. **Notification Access** (for media monitoring)
-   - Required for MediaSession-based playback detection
-   - Navigate to: **Settings → Apps → Special Access → Notification Access**
-   - Enable "Force Max Brightness"
-
-### Optional: Boot Auto-Start
-
-Enable "Auto-start on boot" toggle in the app settings to automatically launch the monitoring service at device startup.
+1. Open the app
+2. Grant `WRITE_SETTINGS` permission when prompted
+3. Adjust system brightness using the slider
+4. (Optional) Enable media monitoring for auto-brightness boost
 
 ## Usage
 
-### Manual Brightness Control
+### Adjusting System Brightness
 
-1. **Grant WRITE_SETTINGS permission** - Tap "Grant Permission" button
-2. **Adjust brightness** using the slider or preset buttons:
-   - **Min**: Set to 0% brightness
-   - **Mid**: Set to 50% brightness  
-   - **Max**: Set to 100% brightness
-3. **Toggle brightness mode** - Switch between Manual (fixed) and Auto (adaptive) modes
+1. Open the app
+2. Use the **System Brightness** slider to adjust (0-255)
+3. Or tap one of the quick buttons:
+   - **Min** - Set to minimum brightness (0)
+   - **Mid** - Set to middle brightness (128)
+   - **Max** - Set to maximum brightness (255)
+4. Toggle **Manual/Auto** mode using the FilterChips
 
 ### Window Brightness Override
 
-Window brightness provides instant app-level brightness without needing system permissions:
-- **Max**: Force app window to maximum brightness
-- **Mid**: Set app window to 50% brightness
-- **Reset**: Return to system brightness level
+1. Navigate to **Window Brightness** card
+2. Tap **Max** to force maximum window brightness
+3. Tap **Mid** for medium window brightness
+4. Tap **Reset** to remove the override
 
-### Auto Media Monitoring
+### Auto-Brightness Monitoring
 
-1. **Enable Notification Access** permission (see Setup section)
-2. **Tap "Start Monitor"** to launch the background service
-3. **Green indicator** shows service is running
-4. **Automatic brightness control**:
-   - Boosts to maximum when video playback detected
-   - Restores original brightness when playback stops/pauses
-5. **Tap "Stop Monitor"** to disable the service
+1. Navigate to **Media Monitoring** card
+2. Tap **Start** to enable media playback detection
+3. The app will automatically boost brightness during playback
+4. (Optional) Enable **Auto-start on boot** for persistent monitoring
 
-### Toggle Auto-Start
+### Permissions
 
-Enable "Auto-start on boot" switch to automatically resume media monitoring after device restart.
+The app requires the following permissions:
+
+- **WRITE_SETTINGS** - To modify system brightness (requested on first launch)
+- **FOREGROUND_SERVICE** - To run media monitoring in the background
+- **POST_NOTIFICATIONS** - To show persistent monitoring notification
+- **RECEIVE_BOOT_COMPLETED** - To auto-start on device boot
 
 ## Architecture
 
-### UI Layer
-- **Jetpack Compose** with Material 3 design system
-- **Responsive layout** with proper status bar handling
-- **Activity-result launcher** for permission handling
-- **Composable state management** with proper recomposition
-
-### Android Layer (Kotlin)
-- **MainActivity**: Sets Compose content and manages activity lifecycle
-- **MediaMonitorService**: Foreground service for playback monitoring
-- **BootReceiver**: Auto-start support
-- **Direct system API access** - no Flutter overhead
-
-### System Integration
-- **Settings.System.SCREEN_BRIGHTNESS** - System brightness control
-- **Settings.System.SCREEN_BRIGHTNESS_MODE** - Manual/Auto mode switching
-- **Window.LayoutParams.screenBrightness** - Window-level override
-- **MediaSessionManager** - Media playback detection
-- **SharedPreferences** - Settings persistence
-
 ### Project Structure
+
 ```
-android/
-├── app/
-│   ├── src/main/
-│   │   ├── kotlin/com/example/force_max_brightness/
-│   │   │   ├── MainActivity.kt          # Entry point
-│   │   │   ├── MediaMonitorService.kt   # Background service
-│   │   │   ├── BootReceiver.kt          # Boot handler
-│   │   │   └── ui/
-│   │   │       ├── Screens.kt           # UI composables
-│   │   │       └── theme/
-│   │   │           ├── Theme.kt         # Material 3 theme
-│   │   │           └── Type.kt          # Typography
-│   │   └── AndroidManifest.xml
-│   ├── build.gradle.kts
-│   └── proguard-rules.pro
-└── settings.gradle.kts
+force_max_brightness/
+├── android/
+│   └── app/
+│       ├── src/main/
+│       │   ├── kotlin/com/example/force_max_brightness/
+│       │   │   ├── MainActivity.kt          # Entry point (Compose Activity)
+│       │   │   ├── MediaMonitorService.kt   # Foreground service
+│       │   │   ├── BootReceiver.kt          # Auto-start receiver
+│       │   │   └── ui/
+│       │   │       ├── Screens.kt           # Main UI composables
+│       │   │       ├── MainActivity.kt      # Compose activity setup
+│       │   │       └── theme/
+│       │   │           ├── Theme.kt         # Material 3 + dynamic colors
+│       │   │           └── Type.kt          # Typography definitions
+│       │   └── AndroidManifest.xml
+│       ├── build.gradle.kts
+│       └── ...
+└── ...
 ```
 
-## Performance
+### Architecture Pattern
 
-- **APK Size**: 16.64 MB (76% reduction from Flutter)
+```
+MainActivity (Compose Activity)
+├── BrightnessControlScreen (Main Composable)
+│   ├── PermissionCard          # Request & display permission status
+│   ├── BrightnessControlCard   # Slider + Quick preset buttons
+│   ├── WindowBrightnessCard    # Window override controls
+│   ├── MediaMonitorCard        # Service management + auto-start
+│   └── StatusBar               # Real-time status display
+├── MediaMonitorService         # Foreground service for playback detection
+├── BootReceiver               # Auto-start on device boot
+└── Theme (Material 3 + Dynamic)
+```
+
+### Key APIs Used
+
+| API | Purpose |
+|-----|---------|
+| `Settings.System.SCREEN_BRIGHTNESS` | Get/set system brightness (0-255) |
+| `Settings.System.SCREEN_BRIGHTNESS_MODE` | Control automatic brightness mode |
+| `Window.LayoutParams.screenBrightness` | Window-level brightness override |
+| `MediaSessionManager` | Detect media playback |
+| `ActivityResultLauncher` | Permission handling |
+| `SharedPreferences` | Settings persistence |
+| `ForegroundService` | Background media monitoring |
+
+## Technical Details
+
+### Theming
+
+The app uses Material 3 with dynamic system colors:
+
+- **Android 12+**: Colors extracted from device wallpaper (Material You)
+- **Android 11 & below**: Fallback Material 3 color palette (orange/amber)
+- **Dark/Light mode**: Automatically detected from system settings via `isSystemInDarkTheme()`
+
+### Performance
+
+- **APK Size**: 16.66 MB (76% smaller than Flutter equivalent)
 - **Build Time**: ~6 seconds (debug build)
 - **Startup Time**: <1 second
-- **Memory Footprint**: Minimal (Compose-only, no Flutter runtime)
-- **Battery Impact**: Low (background service uses minimal resources)
+- **Memory Usage**: Minimal (Compose-only, no runtime engine)
 
-## Known Limitations
+### APK Breakdown
 
-1. **MediaSession Permissions**: Requires manual Notification Access setup
-2. **HDR Detection**: Currently triggers on all video playback (no HDR-specific detection)
-3. **OEM Settings**: OnePlus-specific HBM settings may require manufacturer APIs
-4. **Unrooted Constraint**: Cannot access `/system` settings
-5. **Battery**: Continuous background monitoring uses battery
+| Component | Size |
+|-----------|------|
+| classes.dex | 12.1 MB |
+| resources.arsc | 0.6 MB |
+| Native code | 0.01 MB |
+| Other assets | 3.98 MB |
+| **Total** | **16.66 MB** |
 
-## Development Status
+## Limitations & Future Enhancements
 
-✅ Phase 1: Project Setup  
-✅ Phase 2: Basic Brightness Control  
-✅ Phase 3: Window Override & Mode Controls  
-✅ Phase 4: Media Playback Detection  
-✅ Phase 5: Auto-Start & Settings Persistence  
-✅ Phase 6: Flutter → Compose Migration (76% APK reduction)  
-✅ Phase 7: Permission Handling & UI Polish  
-🔄 Phase 8: Device Testing & Optimization (Next)
+### Current Limitations
+1. No HDR-specific detection (all video playback triggers boost)
+2. Foreground service requires notification access on some devices
+3. OEM-specific brightness APIs (e.g., OnePlus HBM) require special handling
+4. Unrooted devices cannot modify low-level system brightness parameters
 
-See `progress.md` for detailed development tracking.
+### Planned Enhancements
+- [ ] HDR-specific content detection
+- [ ] App-specific brightness profiles
+- [ ] Scheduled brightness control
+- [ ] Advanced notification controls
+- [ ] Battery optimization analysis
+- [ ] Custom brightness curves
+- [ ] Multi-user support
 
-## Testing on Device
+## Development
 
-1. Install APK on Android device (API 24+)
-2. Launch app and grant WRITE_SETTINGS permission
-3. Enable Notification Access for auto-monitoring
-4. Test with Jellyfin, ExoPlayer, or YouTube
-5. Verify brightness boosts during video playback
-6. Check that brightness restores after playback ends
+### Build Configuration
 
-## Troubleshooting
+- **minSdk**: 24 (Android 7.0)
+- **targetSdk**: 35 (Android 16)
+- **compileSdk**: 35
+- **Kotlin Version**: 2.1.0
+- **Gradle Version**: 8.12
 
-### Permission Not Detected After Granting
-- Close and reopen the app
-- App automatically rechecks permission on launch
-- Status should update from "Permission required" to "Permission granted"
+### Building
 
-### Status Bar Overlapping Content
-- App includes 16dp top padding to respect system status bar
-- Scroll content if needed
-- All UI elements should be visible and interactive
-
-### Media Monitor Not Starting
-- Ensure Notification Access is enabled
-- Check device logs: `adb logcat com.example.force_max_brightness`
-- Verify foreground service notification appears
-
-### Build Failures
 ```bash
-# Clean and rebuild
-cd android
-./gradlew clean
+# Debug build
 ./gradlew assembleDebug
+
+# Release build
+./gradlew assembleRelease
+
+# Clean build
+./gradlew clean assembleDebug
+
+# Run on connected device
+./gradlew installDebug
+
+# Run tests
+./gradlew test
 ```
-
-## Future Improvements
-
-- HDR-specific content detection
-- Package-specific app filtering (video apps only)
-- Notification action controls (quick brightness adjust)
-- Advanced battery optimization
-- OEM-specific brightness curves
-- Custom brightness profiles
-- Schedule-based brightness control
-
-## Technology Stack
-
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| UI Framework | Jetpack Compose | 2024.02 |
-| Design System | Material 3 | Latest |
-| Language | Kotlin | 2.1.0 |
-| Build Tool | Gradle | 8.12 |
-| Min API | Android 7.0 | API 24 |
-| Target API | Android 16 | API 35 |
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the **AGPL v3 License** - see the [LICENSE](LICENSE) file for details.
+
+### License Choice Rationale
+
+The AGPL v3 license was chosen to ensure that improvements to this brightness control system—especially any enhancements involving networked features (such as the MediaSession monitoring)—remain available to the community. This copyleft enforcement is more appropriate than GPL v3 for an app with potential remote/networked aspects.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## Acknowledgements
+
+- Built with [Jetpack Compose](https://developer.android.com/jetpack/compose)
+- Designed with [Material 3](https://m3.material.io/)
+- Powered by [Kotlin](https://kotlinlang.org/)
+- Android development community
 
 ## Contact & Support
 
-- **Issues**: Report bugs via GitHub Issues
-- **Discussions**: Feature requests and ideas in GitHub Discussions
+- **Issues**: [GitHub Issues](../../issues)
+- **Discussions**: [GitHub Discussions](../../discussions)
 
 ---
 
-**Disclaimer**: This tool should only be used on devices you own or have explicit permission to modify. Unauthorized system modifications may void warranty or cause unexpected behavior.
+**Disclaimer:** This application is provided as-is for personal use. Always use technology responsibly and in accordance with local laws and regulations.
