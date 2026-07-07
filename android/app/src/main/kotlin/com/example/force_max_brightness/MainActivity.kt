@@ -1,197 +1,127 @@
 package com.example.force_max_brightness
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
-import io.flutter.embedding.android.FlutterActivity
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodChannel
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import com.example.force_max_brightness.ui.BrightnessControlScreen
+import com.example.force_max_brightness.ui.theme.ForceMaxBrightnessTheme
 
-class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.force_max_brightness/brightness"
-    
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        super.configureFlutterEngine(flutterEngine)
-        
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
-            when (call.method) {
-                "canWriteSettings" -> {
-                    result.success(Settings.System.canWrite(context))
-                }
-                "requestWriteSettingsPermission" -> {
-                    val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
-                        data = Uri.parse("package:$packageName")
-                    }
-                    startActivity(intent)
-                    result.success(null)
-                }
-                "getSystemBrightness" -> {
-                    try {
-                        val brightness = Settings.System.getInt(
-                            contentResolver,
-                            Settings.System.SCREEN_BRIGHTNESS
-                        )
-                        result.success(brightness)
-                    } catch (e: Settings.SettingNotFoundException) {
-                        result.error("ERROR", "Could not get brightness", e.message)
-                    }
-                }
-                "setSystemBrightness" -> {
-                    val brightness = call.argument<Int>("brightness")
-                    if (brightness == null) {
-                        result.error("INVALID_ARGUMENT", "Brightness value is required", null)
-                        return@setMethodCallHandler
-                    }
-                    if (!Settings.System.canWrite(context)) {
-                        result.error("PERMISSION_DENIED", "WRITE_SETTINGS permission not granted", null)
-                        return@setMethodCallHandler
-                    }
-                    try {
-                        Settings.System.putInt(
-                            contentResolver,
-                            Settings.System.SCREEN_BRIGHTNESS,
-                            brightness.coerceIn(0, 255)
-                        )
-                        result.success(null)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not set brightness", e.message)
-                    }
-                }
-                "setWindowBrightness" -> {
-                    val brightness = call.argument<Int>("brightness")
-                    if (brightness == null) {
-                        result.error("INVALID_ARGUMENT", "Brightness value is required", null)
-                        return@setMethodCallHandler
-                    }
-                    try {
-                        activity?.runOnUiThread {
-                            val layoutParams = activity?.window?.attributes
-                            layoutParams?.screenBrightness = if (brightness == -1) {
-                                -1.0f  // Use system brightness
-                            } else {
-                                brightness.coerceIn(0, 255) / 255.0f
-                            }
-                            activity?.window?.attributes = layoutParams
-                        }
-                        result.success(null)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not set window brightness", e.message)
-                    }
-                }
-                "getBrightnessMode" -> {
-                    try {
-                        val mode = Settings.System.getInt(
-                            contentResolver,
-                            Settings.System.SCREEN_BRIGHTNESS_MODE
-                        )
-                        // 0 = MANUAL, 1 = AUTOMATIC
-                        result.success(mode)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not get brightness mode", e.message)
-                    }
-                }
-                "setBrightnessMode" -> {
-                    val mode = call.argument<Int>("mode")
-                    if (mode == null) {
-                        result.error("INVALID_ARGUMENT", "Mode value is required (0=MANUAL, 1=AUTO)", null)
-                        return@setMethodCallHandler
-                    }
-                    if (!Settings.System.canWrite(context)) {
-                        result.error("PERMISSION_DENIED", "WRITE_SETTINGS permission not granted", null)
-                        return@setMethodCallHandler
-                    }
-                    try {
-                        Settings.System.putInt(
-                            contentResolver,
-                            Settings.System.SCREEN_BRIGHTNESS_MODE,
-                            mode.coerceIn(0, 1)
-                        )
-                        result.success(null)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not set brightness mode", e.message)
-                    }
-                }
-                "getSystemSetting" -> {
-                    val key = call.argument<String>("key")
-                    val isGlobal = call.argument<Boolean>("isGlobal") ?: false
-                    if (key == null) {
-                        result.error("INVALID_ARGUMENT", "Key is required", null)
-                        return@setMethodCallHandler
-                    }
-                    try {
-                        val value = if (isGlobal) {
-                            Settings.Global.getString(contentResolver, key)
-                        } else {
-                            Settings.System.getString(contentResolver, key)
-                        }
-                        result.success(value)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not read setting", e.message)
-                    }
-                }
-                "setSystemSetting" -> {
-                    val key = call.argument<String>("key")
-                    val value = call.argument<String>("value")
-                    val isGlobal = call.argument<Boolean>("isGlobal") ?: false
-                    if (key == null || value == null) {
-                        result.error("INVALID_ARGUMENT", "Key and value are required", null)
-                        return@setMethodCallHandler
-                    }
-                    if (!Settings.System.canWrite(context)) {
-                        result.error("PERMISSION_DENIED", "WRITE_SETTINGS permission not granted", null)
-                        return@setMethodCallHandler
-                    }
-                    try {
-                        val success = if (isGlobal) {
-                            Settings.Global.putString(contentResolver, key, value)
-                        } else {
-                            Settings.System.putString(contentResolver, key, value)
-                        }
-                        result.success(success)
-                    } catch (e: Exception) {
-                        result.error("ERROR", "Could not write setting: ${e.message}", null)
-                    }
-                }
-                "startMediaMonitor" -> {
-                    val intent = Intent(context, MediaMonitorService::class.java).apply {
-                        action = "START_MONITORING"
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(intent)
-                    } else {
-                        context.startService(intent)
-                    }
-                    result.success(null)
-                }
-                "stopMediaMonitor" -> {
-                    val intent = Intent(context, MediaMonitorService::class.java).apply {
-                        action = "STOP_MONITORING"
-                    }
-                    context.stopService(intent)
-                    result.success(null)
-                }
-                "setAutoStart" -> {
-                    val enabled = call.argument<Boolean>("enabled")
-                    if (enabled == null) {
-                        result.error("INVALID_ARGUMENT", "Enabled value required", null)
-                        return@setMethodCallHandler
-                    }
-                    val prefs = context.getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
-                    prefs.edit().putBoolean("auto_start_service", enabled).apply()
-                    result.success(null)
-                }
-                "getAutoStart" -> {
-                    val prefs = context.getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
-                    val enabled = prefs.getBoolean("auto_start_service", false)
-                    result.success(enabled)
-                }
-                else -> {
-                    result.notImplemented()
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ForceMaxBrightnessTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    BrightnessControlScreen()
                 }
             }
         }
     }
+
+    // Brightness Control Methods
+    fun canWriteSettings(): Boolean {
+        return Settings.System.canWrite(this)
+    }
+
+    fun requestWriteSettingsPermission() {
+        val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS).apply {
+            data = Uri.parse("package:$packageName")
+        }
+        startActivity(intent)
+    }
+
+    fun getSystemBrightness(): Int {
+        return try {
+            Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS)
+        } catch (e: Settings.SettingNotFoundException) {
+            128
+        }
+    }
+
+    fun setSystemBrightness(brightness: Int) {
+        if (!Settings.System.canWrite(this)) return
+        try {
+            Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS,
+                brightness.coerceIn(0, 255)
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun getBrightnessMode(): Int {
+        return try {
+            Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE)
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+    fun setBrightnessMode(mode: Int) {
+        if (!Settings.System.canWrite(this)) return
+        try {
+            Settings.System.putInt(
+                contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS_MODE,
+                mode.coerceIn(0, 1)
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun setWindowBrightness(brightness: Int) {
+        try {
+            val layoutParams = window?.attributes
+            layoutParams?.screenBrightness = if (brightness == -1) {
+                -1.0f
+            } else {
+                brightness.coerceIn(0, 255) / 255.0f
+            }
+            window?.attributes = layoutParams
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // Media Monitor
+    fun startMediaMonitor() {
+        val intent = Intent(this, MediaMonitorService::class.java).apply {
+            action = "START_MONITORING"
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+    }
+
+    fun stopMediaMonitor() {
+        val intent = Intent(this, MediaMonitorService::class.java).apply {
+            action = "STOP_MONITORING"
+        }
+        stopService(intent)
+    }
+
+    // Preferences
+    fun setAutoStart(enabled: Boolean) {
+        // Use blocking call in a separate thread or just write to preferences
+        val prefs = getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("auto_start_service", enabled).apply()
+    }
+
+    fun getAutoStart(): Boolean {
+        val prefs = getSharedPreferences("force_brightness_prefs", Context.MODE_PRIVATE)
+        return prefs.getBoolean("auto_start_service", false)
+    }
 }
+
