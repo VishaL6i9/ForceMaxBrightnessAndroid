@@ -6,7 +6,6 @@ An Android brightness controller for media playback. When you play a video, the 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-blue.svg)](https://kotlinlang.org/)
 [![Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.02-brightgreen.svg)](https://developer.android.com/jetpack/compose)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-orange.svg)](LICENSE)
-[![APK Size](https://img.shields.io/badge/APK%20Size-16.66%20MB-blue.svg)]()
 
 ## What it does
 
@@ -16,14 +15,10 @@ An Android brightness controller for media playback. When you play a video, the 
 
 **Media monitoring**: When you start playing a video in any app, Radiance raises brightness and restores it when you stop. Auto-start runs this service on boot if enabled.
 
-## Build info
-
-The APK is 16.66 MB. It started as a Flutter project at 69.5 MB. Removing Flutter (libflutter.so at 39.5 MB, kernel_blob.bin at 38.6 MB, isolate_snapshot_data at 10.3 MB) cut the size by 76%.
-
 ## Setup
 
 **Requirements**
-- Android 7.0 (API 24) or higher
+- Android 5.0 (API 21) or higher
 - WRITE_SETTINGS permission (you grant this in system settings)
 - Optional: FOREGROUND_SERVICE for media monitoring
 
@@ -97,7 +92,7 @@ On Android 12 and up, the app pulls colors from your wallpaper (Material You). O
 
 **Build targets**
 
-- minSdk: 24 (Android 7.0)
+- minSdk: 21 (Android 5.0)
 - targetSdk: 35 (Android 16)
 - Kotlin: 2.1.0
 - Gradle: 8.12
@@ -106,8 +101,6 @@ On Android 12 and up, the app pulls colors from your wallpaper (Material You). O
 
 | Metric | Value |
 |--------|-------|
-| APK size | 16.66 MB |
-| Size reduction vs Flutter | 76% |
 | Build time | ~6 seconds |
 | Startup time | <1 second |
 
